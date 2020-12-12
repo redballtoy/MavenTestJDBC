@@ -41,8 +41,15 @@ public class HW_03_02_SQL {
                     "good_price integer not null" +
                     ")";
     private final static String QUERY_GOODS_SELECT_ALL = "select * from Goods";
+    private final static String QUERY_GOODS_SELECT_CORRECT_GOOD_NAME = "select * from Goods " +
+            "where good_name ='good_name_18'";
+    private final static String QUERY_GOODS_SELECT_INCORRECT_GOOD_NAME = "select * from Goods " +
+            "where good_name ='good_name_63510'";
+    private final static String QUERY_GOODS_SELECT_BETWEEN_PRICE = "select * from Goods " +
+            "where good_price between ";
     private final static String QUERY_GOODS_DROP_TABLE = "drop table if exists Goods";
     private final static String QUERY_GOODS_DELETE_ALL = "delete from Goods";
+    private final static String QUERY_GOODS_SELECT_COUNT = "select count(good_id) from Goods";
     //Поля таблицы
     private final static String[] colNameGoodsTable = {"good_id", "good_name", "good_price"};
     //вывод
@@ -55,8 +62,8 @@ public class HW_03_02_SQL {
         connection();
 
         //очистка таблицы Goods
-//        DML_Query(QUERY_GOODS_DELETE_ALL, "Данные из таблицы Goods успешно удалены",
-//                "Ошибка удаления данных из таблицы Goods");
+        DML_Query(QUERY_GOODS_DELETE_ALL, "Данные из таблицы Goods успешно удалены",
+                "Ошибка удаления данных из таблицы Goods");
 
         //удаление таблицы
 //        DML_Query(QUERY_GOODS_DROP_TABLE, "Таблица Goods успешно удалена",
@@ -68,14 +75,30 @@ public class HW_03_02_SQL {
 //                "Ошибка создания таблицы Goods :(");
 
         //INSERT ROWS TO GOODS
-        insertValuesToTableGoods(10);
-
+//      insertValuesToTableGoods(9999);
 
         //SELECT QUERY
+        //STUDENTS
         //select(QUERY_STUDENTS_SELECT_AGE, colNameStudentTable,outStudentsAllColumn);
 
+        //GOODS
         //вывести все столбцы из таблицы Goods
-        //select(QUERY_GOODS_SELECT_ALL, colNameGoodsTable);
+        select(QUERY_GOODS_SELECT_ALL, colNameGoodsTable);
+
+        //запросы по ДЗ
+        //4 получить цену товара по его имени или вывести  если его нет
+        //товар есть
+        //select(QUERY_GOODS_SELECT_CORRECT_GOOD_NAME, colNameGoodsTable);
+        //твуого товара нет
+        //select(QUERY_GOODS_SELECT_INCORRECT_GOOD_NAME, colNameGoodsTable);
+
+
+        //5. UPDATE цену товара
+        //updateGoodPrice("good_name_18", 18);
+        //select(QUERY_GOODS_SELECT_CORRECT_GOOD_NAME, colNameGoodsTable);
+
+        //6. Вывести товары в заданной ценовом диапазоне
+        //selectGoodsPriceRange(QUERY_GOODS_SELECT_BETWEEN_PRICE,246, 768);
 
 
         //отключение от БД
@@ -127,10 +150,18 @@ public class HW_03_02_SQL {
     private static void select(String query, String[] columnTable) {
         resultSet = getResultSetByQuery(query);
         System.out.println(columnTable[0] + "\t\t" + columnTable[1] + "\t\t\t" + columnTable[2]);
+        int count = 0;
         while (getOneRowFromResultSet(resultSet)) {
             //вывод содержимого таблицы
             showResultByRows(resultSet, columnTable);
+            count++;
         }
+        if (count == 0) {
+            System.out.printf("Ничего не найдено\n\n");
+        } else {
+            System.out.printf("Найдено %d строк\n\n", count);
+        }
+
     }
 
     private static ResultSet getResultSetByQuery(String query) {
@@ -184,11 +215,13 @@ public class HW_03_02_SQL {
     private static void insertValuesToTableGoods(int countGoods) {
         int i = 0;
         for (i = 0; i <= countGoods; i++) {
-            int k = (int) Math.random() * 1000;
+            int k = (int) (Math.random() * 1000);
             try {
+                int res = i * k;
+                //System.out.println("res=" + res + "i= " + i + " k= " + k);
                 String query = "INSERT INTO Goods (\'good_name\',\'good_price\') " +
-                        "values("+"\'good_name_"+ i +"\'"+","
-                        + (i * k) + ")";
+                        "values(" + "\'good_name_" + i + "\'" + ","
+                        + res + ");";
                 statement.executeUpdate(query);
             } catch (SQLException throwables) {
                 System.out.println("Ошибка вставки данных");
@@ -196,6 +229,26 @@ public class HW_03_02_SQL {
                 return;
             }
         }
-        System.out.printf("\nВ таблицу вставлено %d записей", i);
+        System.out.printf("\nВ таблицу вставлено %d записей\n", i);
+    }
+
+    private static void updateGoodPrice(String goodName, int newPrice) {
+        try {
+            String query = "update Goods " +
+                    "set good_price = " + newPrice +
+                    " where good_name =\'" + goodName + "\'";
+
+            statement.executeUpdate(query);
+            System.out.println("Обновление прошло успешно");
+        } catch (SQLException throwables) {
+            System.out.println("Ошибка при обновлении");
+            throwables.printStackTrace();
+        }
+    }
+
+    private static void selectGoodsPriceRange(String q, int minPrice, int maxPrice) {
+        String query = q + minPrice + " and " + maxPrice;
+        select(query, colNameGoodsTable);
+        //System.out.println(query);
     }
 }
