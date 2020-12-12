@@ -29,7 +29,7 @@ public class HW_03_02_SQL {
     //Поля таблицы
     private final static String[] colNameStudentTable = {"id", "name", "age"};
     //вывод
-    private final static String outStudentsAllColumn = "Id: %d \tName: \t%s, \tage: \t%d \n";
+    //private final static String outStudentsAllColumn = "Id: %d \tName: \t%s, \tage: \t%d \n";
 
 
     //ТАБЛИЦА: Goods
@@ -42,10 +42,11 @@ public class HW_03_02_SQL {
                     ")";
     private final static String QUERY_GOODS_SELECT_ALL = "select * from Goods";
     private final static String QUERY_GOODS_DROP_TABLE = "drop table if exists Goods";
+    private final static String QUERY_GOODS_DELETE_ALL = "delete from Goods";
     //Поля таблицы
     private final static String[] colNameGoodsTable = {"good_id", "good_name", "good_price"};
     //вывод
-    private final static String outGoogsAllColumn = "good_id: %d \tgood_name: \t%s, \tgood_price: \t%d \n";
+    //private final static String outGoogsAllColumn = "good_id: %d \tgood_name: \t%s, \tgood_price: \t%d \n";
 
 
     public static void main(String[] args) {
@@ -53,9 +54,11 @@ public class HW_03_02_SQL {
         //подключение к БД
         connection();
 
+        //очистка таблицы Goods
+//        DML_Query(QUERY_GOODS_DELETE_ALL, "Данные из таблицы Goods успешно удалены",
+//                "Ошибка удаления данных из таблицы Goods");
 
         //удаление таблицы
-
 //        DML_Query(QUERY_GOODS_DROP_TABLE, "Таблица Goods успешно удалена",
 //                "Ошибка удаления таблицы Goods :(");
 
@@ -65,14 +68,14 @@ public class HW_03_02_SQL {
 //                "Ошибка создания таблицы Goods :(");
 
         //INSERT ROWS TO GOODS
-        //insertValuesToTableGoods(10);
+        insertValuesToTableGoods(10);
 
 
         //SELECT QUERY
         //select(QUERY_STUDENTS_SELECT_AGE, colNameStudentTable,outStudentsAllColumn);
 
         //вывести все столбцы из таблицы Goods
-        select(QUERY_GOODS_SELECT_ALL, colNameGoodsTable, outGoogsAllColumn);
+        //select(QUERY_GOODS_SELECT_ALL, colNameGoodsTable);
 
 
         //отключение от БД
@@ -121,11 +124,12 @@ public class HW_03_02_SQL {
     }
 
 
-    private static void select(String query, String[] columnTable, String out) {
+    private static void select(String query, String[] columnTable) {
         resultSet = getResultSetByQuery(query);
+        System.out.println(columnTable[0] + "\t\t" + columnTable[1] + "\t\t\t" + columnTable[2]);
         while (getOneRowFromResultSet(resultSet)) {
             //вывод содержимого таблицы
-            showResultByRows(resultSet, columnTable, out);
+            showResultByRows(resultSet, columnTable);
         }
     }
 
@@ -149,13 +153,13 @@ public class HW_03_02_SQL {
         return true;
     }
 
-    private static void showResultByRows(ResultSet resultSet, String[] columns, String output) {
+    private static void showResultByRows(ResultSet resultSet, String[] columns) {
         try {
-            int id = resultSet.getInt(columns[0]);
-            System.out.printf(output,
-                    resultSet.getInt(columns[0]), //id
-                    resultSet.getString(columns[1]), //name
-                    resultSet.getInt(columns[2]));//age
+            //int id = resultSet.getInt(columns[0]);
+            System.out.println(
+                    resultSet.getInt(columns[0]) //id
+                            + "\t\t\t" + resultSet.getString(columns[1]) //name
+                            + "\t\t\t\t" + resultSet.getInt(columns[2]));//age
         } catch (SQLException throwables) {
             System.out.println("Ошибка вывода строки из ResultTest");
             throwables.printStackTrace();
@@ -180,9 +184,10 @@ public class HW_03_02_SQL {
     private static void insertValuesToTableGoods(int countGoods) {
         int i = 0;
         for (i = 0; i <= countGoods; i++) {
-            int k = new Random(1000).nextInt() + 100;
+            int k = (int) Math.random() * 1000;
             try {
-                String query = "INSERT INTO Goods (\'good_name\',\'good_price\') values(" + i + ","
+                String query = "INSERT INTO Goods (\'good_name\',\'good_price\') " +
+                        "values("+"\'good_name_"+ i +"\'"+","
                         + (i * k) + ")";
                 statement.executeUpdate(query);
             } catch (SQLException throwables) {
@@ -191,6 +196,6 @@ public class HW_03_02_SQL {
                 return;
             }
         }
-        System.out.printf("\nВ таблицу вставлено %d записей",i);
+        System.out.printf("\nВ таблицу вставлено %d записей", i);
     }
 }

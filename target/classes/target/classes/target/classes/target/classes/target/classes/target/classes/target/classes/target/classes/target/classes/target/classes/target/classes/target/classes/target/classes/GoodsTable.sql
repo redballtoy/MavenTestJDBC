@@ -5,4 +5,4 @@ good_name text not null,
 good price integer not null
 )
 
-drop table Goods
+drop table if exists Goods

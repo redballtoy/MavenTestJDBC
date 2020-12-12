@@ -6,3 +6,5 @@ good price integer not null
 )
 
 drop table if exists Goods
+
+select * from Goods
